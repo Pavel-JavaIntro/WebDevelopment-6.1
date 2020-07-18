@@ -31,7 +31,7 @@ public class LibraryControllerTest {
     }
 
     public void abracadabraTest1() {
-        String abracadabra = "gj47xwl2";
+        String abracadabra = "gj47xwl22";
         LibraryResponse response = controller.doRequest(abracadabra);
         String actual = response.getResult();
         assertEquals(actual, RESULT_NOT_OK);
