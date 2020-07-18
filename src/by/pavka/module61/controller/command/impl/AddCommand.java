@@ -11,20 +11,20 @@ import by.pavka.module61.model.service.impl.BookServiceImpl;
 import java.util.List;
 
 public class AddCommand implements LibraryCommand {
-    @Override
-    public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
-        String[] bookData = request.getData().split(FIELD_DELIMITER);
-        if (bookData.length != 5) {
-            throw new LibraryControllerException("Invalid request format");
-        }
-        BookService bookService = new BookServiceImpl();
-        List<Book> books;
-        try {
-            books = bookService.addBook(bookData);
-        } catch (BookServiceException e) {
-            throw new LibraryControllerException("Caught service exception", e);
-        }
-        return books;
+  @Override
+  public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
+    String[] bookData = request.getData().split(FIELD_DELIMITER);
+    if (bookData.length != 5) {
+      throw new LibraryControllerException("Invalid request format");
     }
+    BookService bookService = new BookServiceImpl();
+    List<Book> books;
+    try {
+      books = bookService.addBook(bookData);
+    } catch (BookServiceException e) {
+      throw new LibraryControllerException("Caught service exception", e);
+    }
+    return books;
+  }
 }
 

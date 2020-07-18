@@ -9,9 +9,9 @@ import by.pavka.module61.model.service.impl.BookServiceImpl;
 import java.util.List;
 
 public class ListAllCommand implements LibraryCommand {
-    @Override
-    public List<Book> execute(LibraryRequest request) {
-        BookService bookService = new BookServiceImpl();
-        return bookService.listAllBooks();
-    }
+  @Override
+  public List<Book> execute(LibraryRequest request) {
+    BookService bookService = new BookServiceImpl();
+    return bookService.listAllBooks();
+  }
 }

@@ -11,24 +11,24 @@ import by.pavka.module61.model.service.impl.BookServiceImpl;
 import java.util.List;
 
 public class SortCommand implements LibraryCommand {
-    @Override
-    public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
-        BookTagType tag = request.getTagType();
-        BookService bookService = new BookServiceImpl();
-        switch (tag) {
-            case TITLE:
-                return bookService.sortByTitle();
-            case AUTHORS:
-                return bookService.sortByAuthors();
-            case PUBLISHER:
-                return bookService.sortByPublisher();
-            case YEAR:
-                return bookService.sortByYear();
-            case PAGES:
-                return bookService.sortByNumberOfPages();
-            default:
-                throw new LibraryControllerException("Tag not supported yet");
-        }
+  @Override
+  public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
+    BookTagType tag = request.getTagType();
+    BookService bookService = new BookServiceImpl();
+    switch (tag) {
+      case TITLE:
+        return bookService.sortByTitle();
+      case AUTHORS:
+        return bookService.sortByAuthors();
+      case PUBLISHER:
+        return bookService.sortByPublisher();
+      case YEAR:
+        return bookService.sortByYear();
+      case PAGES:
+        return bookService.sortByNumberOfPages();
+      default:
+        throw new LibraryControllerException("Tag not supported yet");
     }
+  }
 }
 

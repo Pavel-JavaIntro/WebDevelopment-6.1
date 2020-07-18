@@ -12,33 +12,33 @@ import by.pavka.module61.model.service.impl.BookServiceImpl;
 import java.util.List;
 
 public class FindCommand implements LibraryCommand {
-    @Override
-    public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
-        BookTagType tag = request.getTagType();
-        String searchValue = request.getData();
-        BookService bookService = new BookServiceImpl();
-        switch (tag) {
-            case TITLE:
-                return bookService.findByTitle(searchValue);
-            case AUTHORS:
-                return bookService.findByAuthors(searchValue.split(AUTHOR_DELIMITER));
-            case PUBLISHER:
-                return bookService.findByPublisher(searchValue);
-            case YEAR:
-                try {
-                    return bookService.findByYear(searchValue);
-                } catch (BookServiceException e) {
-                    throw new LibraryControllerException("Caught service exception", e);
-                }
-            case PAGES:
-                try {
-                    return bookService.findByNumberOfPages(searchValue);
-                } catch (BookServiceException e) {
-                    throw new LibraryControllerException("Caught service exception", e);
-                }
-            default:
-                throw new LibraryControllerException("Tag not supported yet");
+  @Override
+  public List<Book> execute(LibraryRequest request) throws LibraryControllerException {
+    BookTagType tag = request.getTagType();
+    String searchValue = request.getData();
+    BookService bookService = new BookServiceImpl();
+    switch (tag) {
+      case TITLE:
+        return bookService.findByTitle(searchValue);
+      case AUTHORS:
+        return bookService.findByAuthors(searchValue.split(AUTHOR_DELIMITER));
+      case PUBLISHER:
+        return bookService.findByPublisher(searchValue);
+      case YEAR:
+        try {
+          return bookService.findByYear(searchValue);
+        } catch (BookServiceException e) {
+          throw new LibraryControllerException("Caught service exception", e);
         }
+      case PAGES:
+        try {
+          return bookService.findByNumberOfPages(searchValue);
+        } catch (BookServiceException e) {
+          throw new LibraryControllerException("Caught service exception", e);
+        }
+      default:
+        throw new LibraryControllerException("Tag not supported yet");
     }
+  }
 }
 
