@@ -13,23 +13,23 @@ public interface BookService {
 
   List<Book> excludeBook(String[] bookData) throws BookServiceException;
 
-  List<Book> listAllBooks();
+  List<Book> listAllBooks() throws BookServiceException;
 
-  List<Book> sortByTitle();
+  List<Book> sortByTitle() throws BookServiceException;
 
-  List<Book> sortByAuthors();
+  List<Book> sortByAuthors() throws BookServiceException;
 
-  List<Book> sortByPublisher();
+  List<Book> sortByPublisher() throws BookServiceException;
 
-  List<Book> sortByYear();
+  List<Book> sortByYear() throws BookServiceException;
 
-  List<Book> sortByNumberOfPages();
+  List<Book> sortByNumberOfPages() throws BookServiceException;
 
-  List<Book> findByTitle(String searchValue);
+  List<Book> findByTitle(String searchValue) throws BookServiceException;
 
-  List<Book> findByAuthors(String[] searchValue);
+  List<Book> findByAuthors(String[] searchValue) throws BookServiceException;
 
-  List<Book> findByPublisher(String searchValue);
+  List<Book> findByPublisher(String searchValue) throws BookServiceException;
 
   List<Book> findByYear(String searchValue) throws BookServiceException;
 

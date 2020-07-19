@@ -3,7 +3,7 @@ package test.pavka.module61.model.dao;
 import by.pavka.module61.generator.LibraryFiller;
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.dao.BookListDao;
-import by.pavka.module61.model.dao.impl.BookListDaoImpl;
+import by.pavka.module61.model.dao.impl.ArrayBookListDao;
 import by.pavka.module61.model.entity.book.Book;
 import by.pavka.module61.model.entity.library.impl.LibraryImpl;
 import org.testng.annotations.BeforeMethod;
@@ -16,13 +16,13 @@ import static org.testng.Assert.*;
 
 @Test
 public class BookListDaoTest {
-  private BookListDao dao = new BookListDaoImpl();
+  private BookListDao dao = new ArrayBookListDao();
 
   @BeforeMethod
   public void createLibrary() {
     ((LibraryImpl) LibraryImpl.getInstance()).clean();
     try {
-      LibraryFiller.fillLibrary();
+      LibraryFiller.fillArrayLibrary();
     } catch (LibraryModelException e) {
       fail("LibraryFiller doesn't work");
     }
@@ -120,7 +120,7 @@ public class BookListDaoTest {
     assertEquals(actual, expected);
   }
 
-  public void findBookByYearTest2() {
+  public void findBookByYearTest2() throws LibraryModelException {
     int expected = 0;
     int actual = dao.findBooksByYear(1836).size();
     assertEquals(actual, expected);

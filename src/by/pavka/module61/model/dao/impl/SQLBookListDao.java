@@ -7,6 +7,7 @@ import by.pavka.module61.model.service.BookServiceException;
 import by.pavka.module61.model.service.WrapperConnector;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,9 +20,15 @@ public class SQLBookListDao implements BookListDao {
       "year INTEGER," +
       "pages INTEGER," +
       "PRIMARY KEY (id))";
-  private static final String ADD_BOOK = "INSERT INTO books (title, authors, publisher, year, pages) VALUES (?, ?, ?, ?, ?)";
+  private static final String ADD_BOOK = "INSERT INTO books (title, authors, publisher, year, " +
+      "pages) VALUES(?, ?, ?, ?, ?)";
+  private static final String REMOVE_BOOK = "DELETE FROM books WHERE title=? AND authors=? " +
+      "AND publisher=? AND year=? AND pages=?";
   private static final String CONTAINS_BOOK = "SELECT * FROM books WHERE title=? AND authors=? " +
       "AND publisher=? AND year=? AND pages=?";
+  private static final String ALL = "SELECT * FROM books";
+  private static final String FIND_BOOK = "SELECT * FROM books WHERE ";
+  private static final String SORT_BOOK = "SELECT * FROM books ORDER BY ";
 
   private WrapperConnector connector;
 
@@ -32,9 +39,9 @@ public class SQLBookListDao implements BookListDao {
       statement.execute(CREATE_TABLE);
       connector.closeStatement(statement);
     } catch (BookServiceException e) {
-      throw new LibraryModelException("DAO cannot obtain connection");
+      throw new LibraryModelException("DAO cannot obtain connection", e);
     } catch (SQLException e) {
-      throw new LibraryModelException("Library cannot be created");
+      throw new LibraryModelException("Library cannot be created", e);
     }
   }
 
@@ -43,32 +50,72 @@ public class SQLBookListDao implements BookListDao {
     if (!containsBook(book)) {
       try {
         PreparedStatement statement = connector.obtainPreparedStatement(ADD_BOOK);
-        statement.setString(1, book.getTitle());
-        statement.setString(2, Arrays.toString(book.getAuthors()));
-        statement.setString(3, book.getPublisher());
-        statement.setInt(4, book.getYearOfPublication());
-        statement.setInt(5, book.getNumberOfPages());
+        setBookIntoStatement(book, statement);
         statement.executeUpdate();
         connector.closeStatement(statement);
       } catch (BookServiceException | SQLException e) {
-        throw new LibraryModelException("Book not added");
+        throw new LibraryModelException("Book not added because of SQL or service exception", e);
       }
+    } else {
+      throw new LibraryModelException("Book not added");
     }
   }
 
   @Override
-  public boolean includeBook(Book book) {
+  public boolean includeBook(Book book) throws LibraryModelException {
+    if (!containsBook(book)) {
+      try {
+        PreparedStatement statement = connector.obtainPreparedStatement(ADD_BOOK);
+        setBookIntoStatement(book, statement);
+        statement.executeUpdate();
+        connector.closeStatement(statement);
+        return true;
+      } catch (BookServiceException | SQLException e) {
+        throw new LibraryModelException("Book not included because of SQL or service exception", e);
+      }
+    }
     return false;
   }
 
   @Override
   public void removeBook(Book book) throws LibraryModelException {
+    if (containsBook(book)) {
+      try {
+        PreparedStatement statement = connector.obtainPreparedStatement(REMOVE_BOOK);
+        setBookIntoStatement(book, statement);
+        statement.executeUpdate();
+        connector.closeStatement(statement);
+      } catch (BookServiceException | SQLException e) {
+        throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+      }
+    } else {
+      throw new LibraryModelException("Book not removed");
+    }
 
   }
 
   @Override
-  public boolean excludeBook(Book book) {
+  public boolean excludeBook(Book book) throws LibraryModelException {
+    if (containsBook(book)) {
+      try {
+        PreparedStatement statement = connector.obtainPreparedStatement(REMOVE_BOOK);
+        setBookIntoStatement(book, statement);
+        statement.executeUpdate();
+        connector.closeStatement(statement);
+        return true;
+      } catch (BookServiceException | SQLException e) {
+        throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+      }
+    }
     return false;
+  }
+
+  private void setBookIntoStatement(Book book, PreparedStatement statement) throws SQLException {
+    statement.setString(1, book.getTitle());
+    statement.setString(2, Arrays.toString(book.getAuthors()));
+    statement.setString(3, book.getPublisher());
+    statement.setInt(4, book.getYearOfPublication());
+    statement.setInt(5, book.getNumberOfPages());
   }
 
   @Override
@@ -76,80 +123,104 @@ public class SQLBookListDao implements BookListDao {
     boolean result = false;
     try {
       PreparedStatement statement = connector.obtainPreparedStatement(CONTAINS_BOOK);
-      statement.setString(1, book.getTitle());
-      statement.setString(2, Arrays.toString(book.getAuthors()));
-      statement.setString(3, book.getPublisher());
-      statement.setInt(4, book.getYearOfPublication());
-      statement.setInt(5, book.getNumberOfPages());
-      ResultSet resultSet = statement.executeQuery();
-      if (resultSet.next()) {
-        result = true;
+      setBookIntoStatement(book, statement);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+          result = true;
+        }
       }
       connector.closeStatement(statement);
     } catch (BookServiceException | SQLException e) {
-      throw new LibraryModelException("Caught SQL exception", e);
+      throw new LibraryModelException("Caught connection or SQL exception", e);
     }
     return result;
   }
 
   @Override
-  public List<Book> listAllBooks() {
-    return null;
+  public List<Book> listAllBooks() throws LibraryModelException {
+    return formResultList(ALL);
+  }
+
+  private List<Book> formResultList(String sql) throws LibraryModelException {
+    List<Book> resultList = new ArrayList<>();
+    try {
+      Statement statement = connector.obtainStatement();
+      try (ResultSet resultSet = statement.executeQuery(sql)) {
+        if (resultSet != null) {
+          while (resultSet.next()) {
+            String title = resultSet.getString(2);
+            String[] authors = resultSet.getString(3).split(",\\s?");
+            String publisher = resultSet.getString(4);
+            int year = resultSet.getInt(5);
+            int pages = resultSet.getInt(6);
+            Book book = new Book(title, authors, publisher, year, pages);
+            resultList.add(book);
+          }
+        }
+      }
+    } catch (BookServiceException | SQLException e) {
+      throw new LibraryModelException("Caught connection or SQL exception", e);
+    }
+    return resultList;
   }
 
   @Override
-  public List<Book> sortBooksByTitle() {
-    return null;
+  public List<Book> sortBooksByTitle() throws LibraryModelException {
+    return formResultList(SORT_BOOK + "title");
   }
 
   @Override
-  public List<Book> sortBooksByAuthors() {
-    return null;
+  public List<Book> sortBooksByAuthors() throws LibraryModelException {
+    return formResultList(SORT_BOOK + "authors");
   }
 
   @Override
-  public List<Book> sortBooksByPublisher() {
-    return null;
+  public List<Book> sortBooksByPublisher() throws LibraryModelException {
+    return formResultList(SORT_BOOK + "publisher");
   }
 
   @Override
-  public List<Book> sortBooksByYear() {
-    return null;
+  public List<Book> sortBooksByYear() throws LibraryModelException {
+    return formResultList(SORT_BOOK + "year");
   }
 
   @Override
-  public List<Book> sortBooksByNumberOfPages() {
-    return null;
+  public List<Book> sortBooksByNumberOfPages() throws LibraryModelException {
+    return formResultList(SORT_BOOK + "pages");
   }
 
   @Override
-  public List<Book> findBooksByTitle(String title) {
-    return null;
+  public List<Book> findBooksByTitle(String title) throws LibraryModelException {
+    String sql = FIND_BOOK + "title=" + title;
+    return formResultList(sql);
   }
 
   @Override
-  public List<Book> findBooksByAuthors(String[] authors) {
-    return null;
+  public List<Book> findBooksByAuthors(String[] authors) throws LibraryModelException {
+    String sql = FIND_BOOK + "authors='" + Arrays.toString(authors) + "'";
+    return formResultList(sql);
   }
 
   @Override
-  public List<Book> findBooksByPublisher(String publisher) {
-    return null;
+  public List<Book> findBooksByPublisher(String publisher) throws LibraryModelException {
+    String sql = FIND_BOOK + "publisher='" + publisher + "'";
+    return formResultList(sql);
   }
 
   @Override
-  public List<Book> findBooksByYear(int year) {
-    return null;
+  public List<Book> findBooksByYear(int year) throws LibraryModelException {
+    String sql = FIND_BOOK + "year=" + year;
+    return formResultList(sql);
   }
 
   @Override
-  public List<Book> findBooksByNumberOfPages(int pages) {
-    return null;
+  public List<Book> findBooksByNumberOfPages(int pages) throws LibraryModelException {
+    String sql = FIND_BOOK + "pages=" + pages;
+    return formResultList(sql);
   }
 
   @Override
-  public void close() {
-
+  public void close() throws BookServiceException {
+    connector.closeConnection();
   }
-
 }

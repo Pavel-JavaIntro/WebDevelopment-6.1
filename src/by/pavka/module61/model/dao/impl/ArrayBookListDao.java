@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class BookListDaoImpl implements BookListDao {
+public class ArrayBookListDao implements BookListDao {
 
   @Override
   public void addBook(Book book) throws LibraryModelException {

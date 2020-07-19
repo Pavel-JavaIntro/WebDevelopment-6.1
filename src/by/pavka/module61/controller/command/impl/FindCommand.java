@@ -17,27 +17,23 @@ public class FindCommand implements LibraryCommand {
     BookTagType tag = request.getTagType();
     String searchValue = request.getData();
     BookService bookService = new BookServiceImpl();
-    switch (tag) {
-      case TITLE:
-        return bookService.findByTitle(searchValue);
-      case AUTHORS:
-        return bookService.findByAuthors(searchValue.split(AUTHOR_DELIMITER));
-      case PUBLISHER:
-        return bookService.findByPublisher(searchValue);
-      case YEAR:
-        try {
+    try {
+      switch (tag) {
+        case TITLE:
+          return bookService.findByTitle(searchValue);
+        case AUTHORS:
+          return bookService.findByAuthors(searchValue.split(AUTHOR_DELIMITER));
+        case PUBLISHER:
+          return bookService.findByPublisher(searchValue);
+        case YEAR:
           return bookService.findByYear(searchValue);
-        } catch (BookServiceException e) {
-          throw new LibraryControllerException("Caught service exception", e);
-        }
-      case PAGES:
-        try {
+        case PAGES:
           return bookService.findByNumberOfPages(searchValue);
-        } catch (BookServiceException e) {
-          throw new LibraryControllerException("Caught service exception", e);
-        }
-      default:
-        throw new LibraryControllerException("Tag not supported yet");
+        default:
+          throw new LibraryControllerException("Tag not supported yet");
+      }
+    } catch (BookServiceException e) {
+      throw new LibraryControllerException("Caught service exception", e);
     }
   }
 }

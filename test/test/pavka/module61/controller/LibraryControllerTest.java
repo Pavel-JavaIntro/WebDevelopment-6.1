@@ -24,7 +24,7 @@ public class LibraryControllerTest {
   public void createLibrary() {
     ((LibraryImpl) LibraryImpl.getInstance()).clean();
     try {
-      LibraryFiller.fillLibrary();
+      LibraryFiller.fillArrayLibrary();
     } catch (LibraryModelException e) {
       fail("LibraryFiller doesn't work");
     }
