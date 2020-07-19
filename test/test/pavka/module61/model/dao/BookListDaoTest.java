@@ -29,7 +29,7 @@ public class BookListDaoTest {
   }
 
   public void addBookTest1() {
-    Book book = null;
+    Book book;
     boolean isInLibrary = false;
     try {
       book =

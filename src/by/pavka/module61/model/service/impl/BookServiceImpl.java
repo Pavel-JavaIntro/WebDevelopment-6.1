@@ -2,7 +2,7 @@ package by.pavka.module61.model.service.impl;
 
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.dao.BookListDao;
-import by.pavka.module61.model.dao.impl.ArrayBookListDao;
+import by.pavka.module61.model.dao.impl.SQLBookListDao;
 import by.pavka.module61.model.entity.book.Book;
 import by.pavka.module61.model.service.BookService;
 import by.pavka.module61.model.service.BookServiceException;
@@ -15,8 +15,9 @@ public class BookServiceImpl implements BookService {
   @Override
   public List<Book> addBook(String[] bookData) throws BookServiceException {
     Book book = constructBook(bookData);
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     try {
+      bookListDao = new SQLBookListDao();
       bookListDao.addBook(book);
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while adding book", e);
@@ -30,9 +31,10 @@ public class BookServiceImpl implements BookService {
   @Override
   public List<Book> includeBook(String[] bookData) throws BookServiceException {
     Book book = constructBook(bookData);
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> books = new ArrayList<>();
     try {
+      bookListDao = new SQLBookListDao();
       if (bookListDao.includeBook(book)) {
         books.add(book);
       }
@@ -46,8 +48,9 @@ public class BookServiceImpl implements BookService {
   @Override
   public List<Book> removeBook(String[] bookData) throws BookServiceException {
     Book book = constructBook(bookData);
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     try {
+      bookListDao = new SQLBookListDao();
       bookListDao.removeBook(book);
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while removing book", e);
@@ -61,9 +64,10 @@ public class BookServiceImpl implements BookService {
   @Override
   public List<Book> excludeBook(String[] bookData) throws BookServiceException {
     Book book = constructBook(bookData);
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> books = new ArrayList<>();
     try {
+      bookListDao = new SQLBookListDao();
       if (bookListDao.excludeBook(book)) {
         books.add(book);
       }
@@ -119,9 +123,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> listAllBooks() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.listAllBooks();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while listing book", e);
@@ -132,9 +137,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> sortByTitle() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.sortBooksByTitle();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while sorting book", e);
@@ -145,9 +151,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> sortByAuthors() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.sortBooksByAuthors();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while sorting book", e);
@@ -158,9 +165,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> sortByPublisher() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.sortBooksByPublisher();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while sorting book", e);
@@ -171,9 +179,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> sortByYear() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.sortBooksByYear();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while sorting book", e);
@@ -184,9 +193,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> sortByNumberOfPages() throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.sortBooksByNumberOfPages();
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while sorting book", e);
@@ -197,9 +207,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> findByTitle(String searchValue) throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.findBooksByTitle(searchValue);
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while finding book", e);
@@ -210,9 +221,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> findByAuthors(String[] searchValue) throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.findBooksByAuthors(searchValue);
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while finding book", e);
@@ -223,9 +235,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> findByPublisher(String searchValue) throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.findBooksByPublisher(searchValue);
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while finding book", e);
@@ -236,9 +249,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> findByYear(String searchValue) throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.findBooksByYear(verifyYear(searchValue));
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while finding book", e);
@@ -249,9 +263,10 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Book> findByNumberOfPages(String searchValue) throws BookServiceException {
-    BookListDao bookListDao = new ArrayBookListDao();
+    BookListDao bookListDao;
     List<Book> result;
     try {
+      bookListDao = new SQLBookListDao();
       result = bookListDao.findBooksByNumberOfPages(verifyPages(searchValue));
     } catch (LibraryModelException e) {
       throw new BookServiceException("Caught CRUD exception while finding book", e);
