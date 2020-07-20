@@ -32,7 +32,7 @@ public class WrapperConnector {
         throw new BookServiceException("Statement is null");
 
       } catch (SQLException e) {
-        throw new BookServiceException("Not obtained statement");
+        throw new BookServiceException("Not obtained statement", e);
       }
     }
     throw new BookServiceException("Connection is null");
@@ -49,7 +49,7 @@ public class WrapperConnector {
         throw new BookServiceException("Statement is null");
 
       } catch (SQLException e) {
-        throw new BookServiceException("Not obtained statement");
+        throw new BookServiceException("Not obtained statement", e);
       }
     }
     throw new BookServiceException("Connection is null");
@@ -60,7 +60,7 @@ public class WrapperConnector {
       try {
         statement.close();
       } catch (SQLException e) {
-        throw new BookServiceException("Statement not closed");
+        throw new BookServiceException("Statement not closed", e);
       }
     }
   }
@@ -70,7 +70,7 @@ public class WrapperConnector {
       try {
         connection.close();
       } catch (SQLException e) {
-        throw new BookServiceException("Statement not closed");
+        throw new BookServiceException("Statement not closed", e);
       }
     }
   }
