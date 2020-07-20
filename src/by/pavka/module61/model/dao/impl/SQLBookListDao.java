@@ -24,11 +24,12 @@ public class SQLBookListDao implements BookListDao {
       "pages) VALUES(?, ?, ?, ?, ?)";
   private static final String REMOVE_BOOK = "DELETE FROM books WHERE title=? AND authors=? " +
       "AND publisher=? AND year=? AND pages=?";
-  private static final String CONTAINS_BOOK = "SELECT * FROM books WHERE title=? AND authors=? " +
+  private static final String CONTAINS_BOOK = "SELECT title, authors, publisher, year, pages " +
+      "FROM books WHERE title=? AND authors=? " +
       "AND publisher=? AND year=? AND pages=?";
-  private static final String ALL = "SELECT * FROM books";
-  private static final String FIND_BOOK = "SELECT * FROM books WHERE ";
-  private static final String SORT_BOOK = "SELECT * FROM books ORDER BY ";
+  private static final String ALL = "SELECT title, authors, publisher, year, pages FROM books";
+  private static final String FIND_BOOK = "SELECT title, authors, publisher, year, pages FROM books WHERE ";
+  private static final String SORT_BOOK = "SELECT title, authors, publisher, year, pages FROM books ORDER BY ";
 
   private WrapperConnector connector;
 
