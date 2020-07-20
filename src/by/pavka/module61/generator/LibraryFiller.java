@@ -1,7 +1,7 @@
 package by.pavka.module61.generator;
 
 import by.pavka.module61.model.dao.BookListDao;
-import by.pavka.module61.model.dao.impl.SQLBookListDao;
+import by.pavka.module61.model.dao.impl.SqlBookListDao;
 import by.pavka.module61.model.entity.book.Book;
 import by.pavka.module61.model.entity.library.Library;
 import by.pavka.module61.model.entity.library.impl.LibraryImpl;
@@ -26,7 +26,7 @@ public class LibraryFiller {
   }
 
   public static void fillSQLLibrary() throws LibraryModelException {
-    BookListDao dao = new SQLBookListDao();
+    BookListDao dao = new SqlBookListDao();
     Book book1 = new Book("Drei Kameraden", new String[]{"E.M.Remarque"}, "Gyldendal", 1936, 352);
     Book book2 =
         new Book("12 стульев", new String[]{"И.Ильф", "Е.Петров"}, "Тридцать дней", 1928, 290);

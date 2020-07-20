@@ -2,16 +2,16 @@ package by.pavka.module61.model.dao.impl;
 
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.dao.BookListDao;
+import by.pavka.module61.model.dao.DaoException;
 import by.pavka.module61.model.entity.book.Book;
-import by.pavka.module61.model.service.BookServiceException;
-import by.pavka.module61.model.service.WrapperConnector;
+import by.pavka.module61.model.dao.WrapperConnector;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SQLBookListDao implements BookListDao {
+public class SqlBookListDao implements BookListDao {
   private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS books" +
       "(id INTEGER AUTO_INCREMENT," +
       "title VARCHAR(150)," +
@@ -33,29 +33,39 @@ public class SQLBookListDao implements BookListDao {
 
   private WrapperConnector connector;
 
-  public SQLBookListDao() throws LibraryModelException {
+  public SqlBookListDao() throws LibraryModelException {
+    Statement statement = null;
     try {
       connector = new WrapperConnector();
-      Statement statement = connector.obtainStatement();
+      statement = connector.obtainStatement();
       statement.execute(CREATE_TABLE);
       connector.closeStatement(statement);
-    } catch (BookServiceException e) {
+    } catch (DaoException e) {
       throw new LibraryModelException("DAO cannot obtain connection", e);
     } catch (SQLException e) {
       throw new LibraryModelException("Library cannot be created", e);
+    } finally {
+      if (statement != null) {
+        connector.closeStatement(statement);
+      }
     }
   }
 
   @Override
   public void addBook(Book book) throws LibraryModelException {
     if (!containsBook(book)) {
+      PreparedStatement statement = null;
       try {
-        PreparedStatement statement = connector.obtainPreparedStatement(ADD_BOOK);
+        statement = connector.obtainPreparedStatement(ADD_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
         connector.closeStatement(statement);
-      } catch (BookServiceException | SQLException e) {
-        throw new LibraryModelException("Book not added because of SQL or service exception", e);
+      } catch (DaoException | SQLException e) {
+        throw new LibraryModelException("Book not added because of SQL or Dao exception", e);
+      } finally {
+        if (statement != null) {
+          connector.closeStatement(statement);
+        }
       }
     } else {
       throw new LibraryModelException("Book not added");
@@ -65,14 +75,19 @@ public class SQLBookListDao implements BookListDao {
   @Override
   public boolean includeBook(Book book) throws LibraryModelException {
     if (!containsBook(book)) {
+      PreparedStatement statement = null;
       try {
-        PreparedStatement statement = connector.obtainPreparedStatement(ADD_BOOK);
+        statement = connector.obtainPreparedStatement(ADD_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
         connector.closeStatement(statement);
         return true;
-      } catch (BookServiceException | SQLException e) {
+      } catch (DaoException | SQLException e) {
         throw new LibraryModelException("Book not included because of SQL or service exception", e);
+      } finally {
+        if (statement != null) {
+          connector.closeStatement(statement);
+        }
       }
     }
     return false;
@@ -81,13 +96,18 @@ public class SQLBookListDao implements BookListDao {
   @Override
   public void removeBook(Book book) throws LibraryModelException {
     if (containsBook(book)) {
+      PreparedStatement statement = null;
       try {
-        PreparedStatement statement = connector.obtainPreparedStatement(REMOVE_BOOK);
+        statement = connector.obtainPreparedStatement(REMOVE_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
         connector.closeStatement(statement);
-      } catch (BookServiceException | SQLException e) {
+      } catch (DaoException | SQLException e) {
         throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+      } finally {
+        if (statement != null) {
+          connector.closeStatement(statement);
+        }
       }
     } else {
       throw new LibraryModelException("Book not removed");
@@ -98,14 +118,19 @@ public class SQLBookListDao implements BookListDao {
   @Override
   public boolean excludeBook(Book book) throws LibraryModelException {
     if (containsBook(book)) {
+      PreparedStatement statement = null;
       try {
-        PreparedStatement statement = connector.obtainPreparedStatement(REMOVE_BOOK);
+        statement = connector.obtainPreparedStatement(REMOVE_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
         connector.closeStatement(statement);
         return true;
-      } catch (BookServiceException | SQLException e) {
+      } catch (DaoException | SQLException e) {
         throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+      } finally {
+        if (statement != null) {
+          connector.closeStatement(statement);
+        }
       }
     }
     return false;
@@ -122,8 +147,9 @@ public class SQLBookListDao implements BookListDao {
   @Override
   public boolean containsBook(Book book) throws LibraryModelException {
     boolean result = false;
+    PreparedStatement statement = null;
     try {
-      PreparedStatement statement = connector.obtainPreparedStatement(CONTAINS_BOOK);
+      statement = connector.obtainPreparedStatement(CONTAINS_BOOK);
       setBookIntoStatement(book, statement);
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
@@ -131,8 +157,12 @@ public class SQLBookListDao implements BookListDao {
         }
       }
       connector.closeStatement(statement);
-    } catch (BookServiceException | SQLException e) {
+    } catch (DaoException | SQLException e) {
       throw new LibraryModelException("Caught connection or SQL exception", e);
+    } finally {
+      if (statement != null) {
+        connector.closeStatement(statement);
+      }
     }
     return result;
   }
@@ -144,8 +174,9 @@ public class SQLBookListDao implements BookListDao {
 
   private List<Book> formResultList(String sql) throws LibraryModelException {
     List<Book> resultList = new ArrayList<>();
+    Statement statement = null;
     try {
-      Statement statement = connector.obtainStatement();
+      statement = connector.obtainStatement();
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         if (resultSet != null) {
           while (resultSet.next()) {
@@ -159,8 +190,12 @@ public class SQLBookListDao implements BookListDao {
           }
         }
       }
-    } catch (BookServiceException | SQLException e) {
+    } catch (DaoException | SQLException e) {
       throw new LibraryModelException("Caught connection or SQL exception", e);
+    } finally {
+      if (statement != null) {
+        connector.closeStatement(statement);
+      }
     }
     return resultList;
   }
@@ -221,7 +256,7 @@ public class SQLBookListDao implements BookListDao {
   }
 
   @Override
-  public void close() throws BookServiceException {
+  public void close() {
     connector.closeConnection();
   }
 }
