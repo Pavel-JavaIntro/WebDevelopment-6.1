@@ -4,7 +4,6 @@ import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.dao.BookListDao;
 import by.pavka.module61.model.dao.DaoException;
 import by.pavka.module61.model.entity.book.Book;
-import by.pavka.module61.model.dao.WrapperConnector;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,14 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SqlBookListDao implements BookListDao {
-  private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS books" +
-      "(id INTEGER AUTO_INCREMENT," +
-      "title VARCHAR(150)," +
-      "authors VARCHAR(150)," +
-      "publisher VARCHAR(100)," +
-      "year INTEGER," +
-      "pages INTEGER," +
-      "PRIMARY KEY (id))";
   private static final String ADD_BOOK = "INSERT INTO books (title, authors, publisher, year, " +
       "pages) VALUES(?, ?, ?, ?, ?)";
   private static final String REMOVE_BOOK = "DELETE FROM books WHERE title=? AND authors=? " +
@@ -34,23 +25,15 @@ public class SqlBookListDao implements BookListDao {
   private WrapperConnector connector;
 
   public SqlBookListDao() throws LibraryModelException {
-    Statement statement = null;
     try {
       connector = new WrapperConnector();
-      statement = connector.obtainStatement();
-      statement.execute(CREATE_TABLE);
-      connector.closeStatement(statement);
     } catch (DaoException e) {
       throw new LibraryModelException("DAO cannot obtain connection", e);
-    } catch (SQLException e) {
-      throw new LibraryModelException("Library cannot be created", e);
-    } finally {
-      if (statement != null) {
-        connector.closeStatement(statement);
-      }
     }
   }
 
+  //This method realizes the original requirement to throw an exception if the book exists, For
+  // "boolean" method see the method includeBook below
   @Override
   public void addBook(Book book) throws LibraryModelException {
     if (!containsBook(book)) {
@@ -93,6 +76,8 @@ public class SqlBookListDao implements BookListDao {
     return false;
   }
 
+  //This method realizes the original requirement to throw an exception if the book exists, For
+  // "boolean" method see the method excludeBook below
   @Override
   public void removeBook(Book book) throws LibraryModelException {
     if (containsBook(book)) {

@@ -1,4 +1,6 @@
-package by.pavka.module61.model.dao;
+package by.pavka.module61.model.dao.impl;
+
+import by.pavka.module61.model.dao.DaoException;
 
 import java.sql.*;
 
