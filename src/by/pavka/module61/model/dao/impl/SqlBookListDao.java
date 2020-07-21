@@ -76,8 +76,8 @@ public class SqlBookListDao implements BookListDao {
     return false;
   }
 
-  //This method realizes the original requirement to throw an exception if the book exists, For
-  // "boolean" method see the method excludeBook below
+  // This method realizes the original requirement to throw an exception if the book
+  // doesn't exists.For "boolean" method see the method exclude Book below
   @Override
   public void removeBook(Book book) throws LibraryModelException {
     if (containsBook(book)) {
