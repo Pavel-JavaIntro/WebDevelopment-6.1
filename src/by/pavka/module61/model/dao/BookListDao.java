@@ -2,8 +2,6 @@ package by.pavka.module61.model.dao;
 
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.entity.book.Book;
-import by.pavka.module61.model.service.BookServiceException;
-
 import java.util.List;
 
 public interface BookListDao {
@@ -39,5 +37,6 @@ public interface BookListDao {
 
   List<Book> findBooksByNumberOfPages(int pages) throws LibraryModelException;
 
-  void close() throws BookServiceException;
+  // Not implemented by default to be compatible with the previous implementation
+  void close();
 }

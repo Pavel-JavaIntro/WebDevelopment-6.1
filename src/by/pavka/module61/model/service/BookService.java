@@ -4,6 +4,12 @@ import by.pavka.module61.model.entity.book.Book;
 
 import java.util.List;
 
+/*
+ * This interface contains "duplicating" methods like "sortBy..." and "findBy..." to be
+ * compatible with the previous "Books and Library App" implementation based on ArrayList
+ * Library. Also method pairs "addBook"/"includeBook" and "deleteBook"/"excludeBook" are
+ * maintained to meet the initial requirements of exception handling
+ */
 public interface BookService {
   List<Book> addBook(String[] bookData) throws BookServiceException;
 

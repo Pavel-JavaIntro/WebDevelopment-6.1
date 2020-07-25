@@ -23,24 +23,16 @@ public class ConnectionCreator {
       "PRIMARY KEY (id))";
 
   static {
-    ResourceBundle resourceBundle = ResourceBundle.getBundle("datares.database");
-    String url = resourceBundle.getString(URL);
-    String user = resourceBundle.getString(USER);
-    String pass = resourceBundle.getString(PASS);
-    try {
-      Connection connection = DriverManager.getConnection(url, user, pass);
-      if (connection != null) {
-        Statement statement = null;
-        try {
-          statement = connection.createStatement();
-          statement.execute(CREATE_TABLE);
-        } catch (SQLException e) {
-          System.err.println("Все кончено. Мы погибли. Таблица не создается");
-        }
-        connection.close();
-      }
-    } catch (SQLException | MissingResourceException e) {
-        System.err.println("Все кончено. Мы погибли. Связи с Хьюстоном нет");
+    try (Connection connection = createConnection(); Statement statement = connection.createStatement()) {
+      statement.execute(CREATE_TABLE);
+    } catch (SQLException e) {
+      // This imitates logging
+      System.out.println("Table cannot be created");
+      e.printStackTrace();
+    } catch (DaoException e) {
+      // This imitates logging
+      System.out.println("Connection cannot be created");
+      e.printStackTrace();
     }
   }
 
@@ -52,7 +44,7 @@ public class ConnectionCreator {
       String pass = resourceBundle.getString(PASS);
       return DriverManager.getConnection(url, user, pass);
     } catch (MissingResourceException e) {
-      throw new DaoException("Properties file is missing", e);
+      throw new DaoException("Properties file is missed or malformed", e);
     } catch (SQLException e) {
       throw new DaoException("Not obtained connection", e);
     }

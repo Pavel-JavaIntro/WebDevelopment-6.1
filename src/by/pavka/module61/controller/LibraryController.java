@@ -29,8 +29,8 @@ public class LibraryController {
     try {
       LibraryRequest request = requestCreator.interpretInput(input);
       LibraryCommand libraryCommand = request.getCommandType().getCommand();
-      books = libraryCommand.execute(request);
       response.setOperation(request.getCommandType().toString());
+      books = libraryCommand.execute(request);
       response.setResult(LibraryResponse.RESULT_OK);
       response.setBooks(books);
     } catch (LibraryControllerException e) {

@@ -14,14 +14,14 @@ public class Main {
 
   public static void main(String[] args) {
 
-    String request = "A#Незнайка на Луне:Н.Носов:Детская Литература:1965:180";
-    receiveAndDisplayResponse(request);
-
     try {
-      LibraryFiller.fillSQLLibrary();
+      LibraryFiller.fillSqlLibrary();
     } catch (LibraryModelException e) {
       e.printStackTrace();
     }
+
+    String request = "A#Незнайка на Луне:Н.Носов:Детская Литература:1965:180";
+    receiveAndDisplayResponse(request);
 
     request = "L";
     receiveAndDisplayResponse(request);
@@ -48,6 +48,9 @@ public class Main {
     receiveAndDisplayResponse(request);
 
     request = "R#Sonnets:А.Пушкин:Зарубежная Литература:1987:102";
+    receiveAndDisplayResponse(request);
+
+    request = "U#Sonnets:А.Пушкин:Зарубежная Литература:1987:102";
     receiveAndDisplayResponse(request);
   }
 

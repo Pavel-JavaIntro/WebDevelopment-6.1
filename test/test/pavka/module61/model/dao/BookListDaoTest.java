@@ -3,9 +3,8 @@ package test.pavka.module61.model.dao;
 import by.pavka.module61.generator.LibraryFiller;
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.dao.BookListDao;
-import by.pavka.module61.model.dao.impl.ArrayBookListDao;
+import by.pavka.module61.model.dao.impl.SqlBookListDao;
 import by.pavka.module61.model.entity.book.Book;
-import by.pavka.module61.model.entity.library.impl.LibraryImpl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -16,13 +15,13 @@ import static org.testng.Assert.*;
 
 @Test
 public class BookListDaoTest {
-  private BookListDao dao = new ArrayBookListDao();
+  private BookListDao dao;
 
   @BeforeMethod
   public void createLibrary() {
-    ((LibraryImpl) LibraryImpl.getInstance()).clean();
     try {
-      LibraryFiller.fillArrayLibrary();
+      LibraryFiller.fillSqlLibrary();
+      dao = new SqlBookListDao();
     } catch (LibraryModelException e) {
       fail("LibraryFiller doesn't work");
     }
@@ -96,6 +95,7 @@ public class BookListDaoTest {
     expected.add(
         new Book("12 стульев", new String[]{"И.Ильф", "Е.Петров"}, "Тридцать дней", 1928, 290));
     List<Book> actual = dao.sortBooksByAuthors();
+    System.out.println(actual);
     assertEquals(actual, expected);
   }
 

@@ -18,9 +18,15 @@ public class SqlBookListDao implements BookListDao {
   private static final String CONTAINS_BOOK = "SELECT title, authors, publisher, year, pages " +
       "FROM books WHERE title=? AND authors=? " +
       "AND publisher=? AND year=? AND pages=?";
-  private static final String ALL = "SELECT title, authors, publisher, year, pages FROM books";
-  private static final String FIND_BOOK = "SELECT title, authors, publisher, year, pages FROM books WHERE ";
-  private static final String SORT_BOOK = "SELECT title, authors, publisher, year, pages FROM books ORDER BY ";
+  private static final String LIST_ALL = "SELECT title, authors, publisher, year, pages FROM books";
+  private static final String FIND_BOOKS = "SELECT title, authors, publisher, year, pages FROM books WHERE ";
+  private static final String SORT_BOOKS = "SELECT title, authors, publisher, year, pages FROM books ORDER BY ";
+  private static final String COLUMN_TITLE = "title";
+  private static final String COLUMN_AUTHORS = "authors";
+  private static final String COLUMN_PUBLISHER = "publisher";
+  private static final String COLUMN_YEAR = "year";
+  private static final String COLUMN_NUMBER_OF_PAGES = "pages";
+  private static final String AUTHOR_DELIMITER = ",\\s?";
 
   private WrapperConnector connector;
 
@@ -32,23 +38,20 @@ public class SqlBookListDao implements BookListDao {
     }
   }
 
-  //This method realizes the original requirement to throw an exception if the book exists, For
+  //This method realizes the original requirement to throw an exception if the book exists. For
   // "boolean" method see the method includeBook below
   @Override
   public void addBook(Book book) throws LibraryModelException {
-    if (!containsBook(book)) {
+    if (book != null && !containsBook(book)) {
       PreparedStatement statement = null;
       try {
         statement = connector.obtainPreparedStatement(ADD_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
-        connector.closeStatement(statement);
       } catch (DaoException | SQLException e) {
         throw new LibraryModelException("Book not added because of SQL or Dao exception", e);
       } finally {
-        if (statement != null) {
-          connector.closeStatement(statement);
-        }
+        connector.closeStatement(statement);
       }
     } else {
       throw new LibraryModelException("Book not added");
@@ -57,27 +60,24 @@ public class SqlBookListDao implements BookListDao {
 
   @Override
   public boolean includeBook(Book book) throws LibraryModelException {
-    if (!containsBook(book)) {
+    if (book != null && !containsBook(book)) {
       PreparedStatement statement = null;
       try {
         statement = connector.obtainPreparedStatement(ADD_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
-        connector.closeStatement(statement);
         return true;
       } catch (DaoException | SQLException e) {
-        throw new LibraryModelException("Book not included because of SQL or service exception", e);
+        throw new LibraryModelException("Book not included because of SQL or Dao exception", e);
       } finally {
-        if (statement != null) {
-          connector.closeStatement(statement);
-        }
+        connector.closeStatement(statement);
       }
     }
     return false;
   }
 
   // This method realizes the original requirement to throw an exception if the book
-  // doesn't exists.For "boolean" method see the method exclude Book below
+  // doesn't exists. For "boolean" method see the method exclude Book below
   @Override
   public void removeBook(Book book) throws LibraryModelException {
     if (containsBook(book)) {
@@ -86,13 +86,10 @@ public class SqlBookListDao implements BookListDao {
         statement = connector.obtainPreparedStatement(REMOVE_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
-        connector.closeStatement(statement);
       } catch (DaoException | SQLException e) {
-        throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+        throw new LibraryModelException("Book not removed because of SQL or Dao exception", e);
       } finally {
-        if (statement != null) {
-          connector.closeStatement(statement);
-        }
+        connector.closeStatement(statement);
       }
     } else {
       throw new LibraryModelException("Book not removed");
@@ -108,14 +105,11 @@ public class SqlBookListDao implements BookListDao {
         statement = connector.obtainPreparedStatement(REMOVE_BOOK);
         setBookIntoStatement(book, statement);
         statement.executeUpdate();
-        connector.closeStatement(statement);
         return true;
       } catch (DaoException | SQLException e) {
-        throw new LibraryModelException("Book not removed because of SQL or service exception", e);
+        throw new LibraryModelException("Book not removed because of SQL or Dao exception", e);
       } finally {
-        if (statement != null) {
-          connector.closeStatement(statement);
-        }
+        connector.closeStatement(statement);
       }
     }
     return false;
@@ -123,7 +117,8 @@ public class SqlBookListDao implements BookListDao {
 
   private void setBookIntoStatement(Book book, PreparedStatement statement) throws SQLException {
     statement.setString(1, book.getTitle());
-    statement.setString(2, Arrays.toString(book.getAuthors()));
+    String authors = Arrays.toString(book.getAuthors());
+    statement.setString(2, authors.substring(1, authors.length() - 1));
     statement.setString(3, book.getPublisher());
     statement.setInt(4, book.getYearOfPublication());
     statement.setInt(5, book.getNumberOfPages());
@@ -141,20 +136,17 @@ public class SqlBookListDao implements BookListDao {
           result = true;
         }
       }
-      connector.closeStatement(statement);
     } catch (DaoException | SQLException e) {
       throw new LibraryModelException("Caught connection or SQL exception", e);
     } finally {
-      if (statement != null) {
-        connector.closeStatement(statement);
-      }
+      connector.closeStatement(statement);
     }
     return result;
   }
 
   @Override
   public List<Book> listAllBooks() throws LibraryModelException {
-    return formResultList(ALL);
+    return formResultList(LIST_ALL);
   }
 
   private List<Book> formResultList(String sql) throws LibraryModelException {
@@ -165,11 +157,11 @@ public class SqlBookListDao implements BookListDao {
       try (ResultSet resultSet = statement.executeQuery(sql)) {
         if (resultSet != null) {
           while (resultSet.next()) {
-            String title = resultSet.getString(2);
-            String[] authors = resultSet.getString(3).split(",\\s?");
-            String publisher = resultSet.getString(4);
-            int year = resultSet.getInt(5);
-            int pages = resultSet.getInt(6);
+            String title = resultSet.getString(COLUMN_TITLE);
+            String[] authors = resultSet.getString(COLUMN_AUTHORS).split(AUTHOR_DELIMITER);
+            String publisher = resultSet.getString(COLUMN_PUBLISHER);
+            int year = resultSet.getInt(COLUMN_YEAR);
+            int pages = resultSet.getInt(COLUMN_NUMBER_OF_PAGES);
             Book book = new Book(title, authors, publisher, year, pages);
             resultList.add(book);
           }
@@ -178,65 +170,67 @@ public class SqlBookListDao implements BookListDao {
     } catch (DaoException | SQLException e) {
       throw new LibraryModelException("Caught connection or SQL exception", e);
     } finally {
-      if (statement != null) {
-        connector.closeStatement(statement);
-      }
+      connector.closeStatement(statement);
     }
     return resultList;
   }
 
   @Override
   public List<Book> sortBooksByTitle() throws LibraryModelException {
-    return formResultList(SORT_BOOK + "title");
+    return formResultList(SORT_BOOKS + COLUMN_TITLE);
   }
 
   @Override
   public List<Book> sortBooksByAuthors() throws LibraryModelException {
-    return formResultList(SORT_BOOK + "authors");
+    return formResultList(SORT_BOOKS + COLUMN_AUTHORS);
   }
 
   @Override
   public List<Book> sortBooksByPublisher() throws LibraryModelException {
-    return formResultList(SORT_BOOK + "publisher");
+    return formResultList(SORT_BOOKS + COLUMN_PUBLISHER);
   }
 
   @Override
   public List<Book> sortBooksByYear() throws LibraryModelException {
-    return formResultList(SORT_BOOK + "year");
+    return formResultList(SORT_BOOKS + COLUMN_YEAR);
   }
 
   @Override
   public List<Book> sortBooksByNumberOfPages() throws LibraryModelException {
-    return formResultList(SORT_BOOK + "pages");
+    return formResultList(SORT_BOOKS + COLUMN_NUMBER_OF_PAGES);
   }
 
   @Override
   public List<Book> findBooksByTitle(String title) throws LibraryModelException {
-    String sql = FIND_BOOK + "title=" + title;
+    String sql = FIND_BOOKS + COLUMN_TITLE + "='" + title + "'";
     return formResultList(sql);
   }
 
   @Override
   public List<Book> findBooksByAuthors(String[] authors) throws LibraryModelException {
-    String sql = FIND_BOOK + "authors='" + Arrays.toString(authors) + "'";
+    String authorString = Arrays.toString(authors);
+    String sql =
+        FIND_BOOKS + COLUMN_AUTHORS + "='" + authorString.substring(1, authorString.length() - 1) +
+            "'";
+    System.out.println(sql);
     return formResultList(sql);
   }
 
   @Override
   public List<Book> findBooksByPublisher(String publisher) throws LibraryModelException {
-    String sql = FIND_BOOK + "publisher='" + publisher + "'";
+    String sql = FIND_BOOKS + COLUMN_PUBLISHER + "='" + publisher + "'";
     return formResultList(sql);
   }
 
   @Override
   public List<Book> findBooksByYear(int year) throws LibraryModelException {
-    String sql = FIND_BOOK + "year=" + year;
+    String sql = FIND_BOOKS + COLUMN_YEAR + "=" + year;
     return formResultList(sql);
   }
 
   @Override
   public List<Book> findBooksByNumberOfPages(int pages) throws LibraryModelException {
-    String sql = FIND_BOOK + "pages=" + pages;
+    String sql = FIND_BOOKS + COLUMN_NUMBER_OF_PAGES + "=" + pages;
     return formResultList(sql);
   }
 

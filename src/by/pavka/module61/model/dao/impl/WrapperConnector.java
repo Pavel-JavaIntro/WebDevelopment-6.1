@@ -13,10 +13,8 @@ public class WrapperConnector {
 
   public Statement obtainStatement() throws DaoException {
     if (connection != null) {
-      Statement statement;
       try {
-        statement = connection.createStatement();
-        return statement;
+        return connection.createStatement();
       } catch (SQLException e) {
         throw new DaoException("Not obtained statement", e);
       }
@@ -26,10 +24,8 @@ public class WrapperConnector {
 
   public PreparedStatement obtainPreparedStatement(String sql) throws DaoException {
     if (connection != null) {
-      PreparedStatement statement;
       try {
-        statement = connection.prepareStatement(sql);
-        return statement;
+        return connection.prepareStatement(sql);
       } catch (SQLException e) {
         throw new DaoException("Not obtained statement", e);
       }
@@ -42,7 +38,9 @@ public class WrapperConnector {
       try {
         statement.close();
       } catch (SQLException e) {
-        System.err.println("Statement not closed");
+        // This imitates logging
+        System.out.println("Statement not closed");
+        e.printStackTrace();
       }
     }
   }
@@ -52,7 +50,9 @@ public class WrapperConnector {
       try {
         connection.close();
       } catch (SQLException e) {
-        System.err.println("Connection not closed");
+        // This imitates logging
+        System.out.println("Connection not closed");
+        e.printStackTrace();
       }
     }
   }

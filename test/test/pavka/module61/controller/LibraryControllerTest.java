@@ -5,7 +5,6 @@ import by.pavka.module61.controller.response.LibraryResponse;
 import by.pavka.module61.generator.LibraryFiller;
 import by.pavka.module61.model.LibraryModelException;
 import by.pavka.module61.model.entity.book.Book;
-import by.pavka.module61.model.entity.library.impl.LibraryImpl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -22,9 +21,8 @@ public class LibraryControllerTest {
 
   @BeforeMethod
   public void createLibrary() {
-    ((LibraryImpl) LibraryImpl.getInstance()).clean();
     try {
-      LibraryFiller.fillArrayLibrary();
+      LibraryFiller.fillSqlLibrary();
     } catch (LibraryModelException e) {
       fail("LibraryFiller doesn't work");
     }
@@ -45,7 +43,7 @@ public class LibraryControllerTest {
   }
 
   public void abracadabraTest3() {
-    String abracadabra = "S#j47xwlo";
+    String abracadabra = "S#j47xwl33o";
     LibraryResponse response = controller.doRequest(abracadabra);
     List<Book> actual = response.getBooks();
     assertNull(actual);
@@ -97,7 +95,7 @@ public class LibraryControllerTest {
   }
 
   public void excludeTest() {
-    String input = "R#Sonnets:А.Пушкин:Зарубежная Литература:1987:102";
+    String input = "E#Sonnets:А.Пушкин:Зарубежная Литература:1987:102";
     controller.doRequest(input);
     String input2 = "L";
     LibraryResponse response = controller.doRequest(input2);
@@ -125,6 +123,19 @@ public class LibraryControllerTest {
 
   public void findByAuthors() throws LibraryModelException {
     String input = "F#A#W.Shakespeare";
+    LibraryResponse response = controller.doRequest(input);
+    Book expected =
+        new Book("Sonnets", new String[]{"W.Shakespeare"}, "Зарубежная Литература", 1987, 102);
+
+    Book actual = null;
+    if (response.getBooks().size() > 0) {
+      actual = response.getBooks().get(0);
+    }
+    assertEquals(actual, expected);
+  }
+
+  public void findByTitle() throws LibraryModelException {
+    String input = "F#T#Sonnets";
     LibraryResponse response = controller.doRequest(input);
     Book expected =
         new Book("Sonnets", new String[]{"W.Shakespeare"}, "Зарубежная Литература", 1987, 102);
