@@ -212,7 +212,6 @@ public class SqlBookListDao implements BookListDao {
     String sql =
         FIND_BOOKS + COLUMN_AUTHORS + "='" + authorString.substring(1, authorString.length() - 1) +
             "'";
-    System.out.println(sql);
     return formResultList(sql);
   }
 

@@ -49,12 +49,22 @@ public class LibraryControllerTest {
     assertNull(actual);
   }
 
-  public void addTest() throws LibraryModelException {
+  public void addTest1() throws LibraryModelException {
     String input = "A#Три капитана:В.Каверин:Молодая гвардия:1987:304";
     LibraryResponse response = controller.doRequest(input);
     Book actual = response.getBooks().get(0);
     Book expected =
         new Book("Три капитана", new String[]{"В.Каверин"}, "Молодая гвардия", 1987, 304);
+    assertEquals(actual, expected);
+  }
+
+  public void addTest2() throws LibraryModelException {
+    String input = "A#Незнайка на Луне:Н.Носов:Детская Литература:1965:180";
+    controller.doRequest(input);
+    String input2 = "L";
+    LibraryResponse response = controller.doRequest(input2);
+    int actual = response.getBooks().size();
+    int expected = 6;
     assertEquals(actual, expected);
   }
 
@@ -94,8 +104,18 @@ public class LibraryControllerTest {
     assertEquals(actual, RESULT_NOT_OK);
   }
 
-  public void excludeTest() {
-    String input = "E#Sonnets:А.Пушкин:Зарубежная Литература:1987:102";
+  public void excludeTest1() {
+    String input = "E#Sonnets:W.Shakespeare:Зарубежная Литература:1987:102";
+    controller.doRequest(input);
+    String input2 = "L";
+    LibraryResponse response = controller.doRequest(input2);
+    int expected = 4;
+    int actual = response.getBooks().size();
+    assertEquals(actual, expected);
+  }
+
+  public void excludeTest2() {
+    String input = "E#Незнайка в Солнечном Городе:Н.Носов:Детская Литература:1965:180";
     controller.doRequest(input);
     String input2 = "L";
     LibraryResponse response = controller.doRequest(input2);

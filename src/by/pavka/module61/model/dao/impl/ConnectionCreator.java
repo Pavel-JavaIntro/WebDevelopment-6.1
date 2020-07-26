@@ -36,6 +36,8 @@ public class ConnectionCreator {
     }
   }
 
+  private ConnectionCreator() {}
+
   public static Connection createConnection() throws DaoException {
     try {
       ResourceBundle resourceBundle = ResourceBundle.getBundle("datares.database");

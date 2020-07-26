@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+// Outdated class
 public class ArrayBookListDao implements BookListDao {
 
   @Override

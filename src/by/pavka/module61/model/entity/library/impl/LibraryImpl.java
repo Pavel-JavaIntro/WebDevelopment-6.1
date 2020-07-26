@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// Outdated class
 public class LibraryImpl implements Library {
   private static Library instance;
 
